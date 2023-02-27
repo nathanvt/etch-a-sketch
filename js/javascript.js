@@ -2,8 +2,39 @@ const grid = document.getElementById('gridContainer')
 const box = document.getElementById('box');
 const resizebtn = document.getElementById('resize')
 const gridCallout = document.getElementById('gridCallout');
+const shadebtn = document.getElementById('shade');
+const magic = document.getElementById('magic');
 
-resizebtn.addEventListener('click', () => resize());
+resizebtn.addEventListener('click', resize);
+shadebtn.addEventListener('click', shadeMode);
+magic.addEventListener('click', magicToggle);
+
+let mode = 'normal';
+let magicMode = 'off';
+let fillColor = 'rgba(51, 51, 51,';
+let colors = [
+    'rgba(249, 200, 14,'  /*'#F9C80E' yellow*/,
+    'rgba(255, 153, 204,'  /*'#FF99CC' pink*/,
+    'rgba(34, 111, 84,'  /*'#226F54' green*/, 
+    'rgba(67, 188, 205,'  /*'#43BCCD' blue*/,
+    'rgba(102, 46, 155,'  /*'#662E9B' purple*/,
+    'rgba(248, 102, 36,'  /*'#F86624' orange*/,
+    'rgba(234, 53, 70,'  /*'#EA3546' red*/
+    ];
+let aValue = ' 1.0)'
+
+function magicText() {
+    const letters = document.querySelectorAll('#magic > span');
+    let i = 0;
+    magic.style.textShadow = "0 0 8px pink";
+
+    letters.forEach((span) => {
+        let color = colors[i];
+        const letter = span;
+        letter.style.color = color + aValue;
+        i++;
+    });
+}
 
 function gridBox() {
     const makeGrid = document.createElement('div');
@@ -11,7 +42,6 @@ function gridBox() {
     makeGrid.setAttribute('id', 'box');
     grid.appendChild(makeGrid);
 }
-
 
 function fillGrid(rows) {
     if (rows) {
@@ -26,12 +56,36 @@ function fillGrid(rows) {
             gridSquare.style.flexBasis = value;
         });
         draw();
-        console.log('flex' + value);
     } else {
         for (let i = 0; i < 256; i++) {
             gridBox();
         }
-        console.log('Default 16x16');
+    }
+}
+
+function shadeMode(){
+    if (mode === 'normal') {
+        mode = 'shading';
+        shadebtn.classList.add('active-btn')
+    } else if (mode === 'shading'){
+        mode = 'normal'
+        shadebtn.classList.remove('active-btn')
+    }
+}
+
+function magicToggle(){
+    if (magicMode === 'off') {
+        magicMode = 'on';
+        magicText();
+    } else if (magicMode === 'on'){
+        magicMode = 'off';
+        magic.style.textShadow = "none";
+        fillColor = 'rgba(51, 51, 51,';
+        const letters = document.querySelectorAll('#magic > span');
+        letters.forEach((span) => {
+            const letter = span;
+            letter.style.color = '#FFF';
+        });
     }
 }
 
@@ -42,11 +96,9 @@ function resize() {
     } else if (entry <= 100) {
         console.log(entry);
         let rows = entry * entry;
-        //console.log(rows);
         fillGrid(rows);
         clear();
         gridCallout.innerText = `${entry}x${entry}`;
-        console.log(rows + ' sqaures');
     } else if (typeof entry == 'string') {
         alert('Please enter a number between 1 and 100.')
     }
@@ -57,25 +109,43 @@ function draw(){
 
     gridSquares.forEach((square) => {
         const gridSquare = square;
-            gridSquare.addEventListener('mouseover', (e) => {
-                e.target.classList.add('fill');
-            });
-        }
-    );
+        gridSquare.count = 1;
+        gridSquare.addEventListener('mouseover', (e) => {
+            if (mode === 'normal') {
+                if (magicMode === 'on') {
+                    const randomColor = Math.floor(Math.random() * colors.length);
+                    fillColor = colors[randomColor];
+                }
+                e.target.style.backgroundColor = fillColor + aValue;
+                e.target.style.borderColor = 'rgba(200, 200, 200, 0.25';
+            } else if (mode === 'shading'){
+                if (magicMode === 'on') {
+                    const randomColor = Math.floor(Math.random() * colors.length);
+                    fillColor = colors[randomColor];
+                }
+                let shadeFactor = 0.10 * e.target.count;
+                let value = shadeFactor.toString() + ')';
+                e.target.style.backgroundColor = fillColor + value;
+                e.target.style.borderColor = 'rgba(200, 200, 200, 0.25';
+                e.target.count++;
+            } 
+        })
+    });
 }
 
 function clear() {
     const gridSquares = document.querySelectorAll('#gridContainer > div');
     gridSquares.forEach((square) => {
         const gridSquare = square;
-        gridSquare.classList.remove('fill');
-        console.log('cleared');
+        gridSquare.style.backgroundColor = '#FFF';
+        gridSquare.style.borderColor = 'rgba(200, 200, 200, 1.0)'
+        gridSquare.count = 0.5;
+        gridSquare.shadeFactor = 0.1;
     });
 }
 
 function clearEvent(){
     const clearbtn = document.getElementById('clear');
-
     clearbtn.addEventListener('click', clear); 
 }
 
@@ -86,8 +156,6 @@ function removeGrid() {
         gridSquare.remove();
     });
 }
-
-
 
 function play() {
     fillGrid();
