@@ -117,16 +117,18 @@ function draw(){
                     fillColor = colors[randomColor];
                 }
                 e.target.style.backgroundColor = fillColor + aValue;
-                e.target.style.borderColor = 'rgba(200, 200, 200, 0.25';
+                //e.target.style.borderColor = 'rgba(200, 200, 200, .5';
             } else if (mode === 'shading'){
                 if (magicMode === 'on') {
                     const randomColor = Math.floor(Math.random() * colors.length);
                     fillColor = colors[randomColor];
                 }
                 let shadeFactor = 0.10 * e.target.count;
-                let value = shadeFactor.toString() + ')';
-                e.target.style.backgroundColor = fillColor + value;
-                e.target.style.borderColor = 'rgba(200, 200, 200, 0.25';
+                //let lightenFactor = 1 - shadeFactor + 0.25;
+                let shadeValue = shadeFactor.toString() + ')';
+                //let lightenValue = lightenFactor.toString() + ')';
+                e.target.style.backgroundColor = fillColor + shadeValue;
+                //e.target.style.borderColor = 'rgba(200, 200, 200,' + lightenValue;
                 e.target.count++;
             } 
         })
@@ -138,7 +140,7 @@ function clear() {
     gridSquares.forEach((square) => {
         const gridSquare = square;
         gridSquare.style.backgroundColor = '#FFF';
-        gridSquare.style.borderColor = 'rgba(200, 200, 200, 1.0)'
+        //gridSquare.style.borderColor = 'rgba(200, 200, 200, 1.0)'
         gridSquare.count = 0.5;
         gridSquare.shadeFactor = 0.1;
     });
